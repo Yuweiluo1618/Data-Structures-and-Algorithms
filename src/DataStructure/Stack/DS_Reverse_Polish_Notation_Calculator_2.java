@@ -5,11 +5,17 @@ import java.util.ArrayList;
 public class DS_Reverse_Polish_Notation_Calculator_2 {
 
     public static void main(String[] args) {
-        String expression = "30 4 + 5 * 6 -";
-        ArrayList<String> arrayList = getList(expression);
-        int result = calculator(arrayList);
-        System.out.printf("expression result: %d \n", result);
-
+//        String expression = "30 4 + 5 * 6 -";
+////        ArrayList<String> arrayList = getList(expression);
+////        int result = calculator(arrayList);
+////        System.out.printf("expression result: %d \n", result);
+        String infix = "1+((2+3)*4)-5";
+        //中缀表达式字符串=>中缀表达式链表
+        ArrayList<String> inStringList = getInfixList(infix);
+        System.out.println("infix: "+inStringList);
+        ArrayList<String> postFixList = getPostfixList(inStringList);
+        System.out.println("postfix: "+postFixList);
+        System.out.println(calculator(postFixList));
 
 
     }
@@ -22,6 +28,105 @@ public class DS_Reverse_Polish_Notation_Calculator_2 {
         }
         return ret;
     }
+
+    public static ArrayList<String> getInfixList(String infix){
+        ArrayList<String> infixList = new ArrayList<String>();
+        int index = 0;
+        char ch;
+        String num ="";
+        while (true){
+            ch = infix.charAt(index);
+            if(ch < '0' || ch > '9'){
+                //中缀表达式为运算符
+                infixList.add(""+ch);
+                index++;
+            }
+            else{
+                //中缀表达式位数字
+                while (true){
+                    if(index >= infix.length() || ((ch = infix.charAt(index)) < '0' || ch > '9')){
+                        infixList.add(num);
+                        num = "";
+                        break;
+                    }
+                    num += ch;
+                    index++;
+                }
+
+            }
+
+            if(index >= infix.length()){
+                break;
+            }
+
+
+        }
+
+        return infixList;
+    }
+
+    public static ArrayList<String> getPostfixList(ArrayList<String> infixList){
+        ArrayStack4 s1 = new ArrayStack4(30);
+        ArrayList<String> postFixList = new ArrayList<String>();
+
+        for(String item : infixList){
+            if (s1.isOperator(item)){
+                //是符号
+                if(!(item.equals("(") || item.equals(")"))){
+                    //不是括号的运算符
+                    if(s1.isEmpty()){
+                        s1.push(item);
+                    }
+                    else if(s1.priority(item) <= s1.priority(s1.peek())){
+                        while (true){
+                            if(s1.isEmpty() || (s1.priority(item) > s1.priority(s1.peek()))){
+                                break;
+                            }
+                            postFixList.add(s1.pop());
+                        }
+                        s1.push(item);
+                    }
+                    else if(s1.priority(item) > s1.priority(s1.peek())){
+                        s1.push(item);
+                    }
+                }
+                else {
+                    //为括号的情况
+                    if(item.equals("(")){
+//                        s1.showStack();
+//                        System.out.println("---------------");
+                        s1.push(item);
+                    }
+                    else if(item.equals(")")){
+                        while (true){
+                            if(s1.peek().equals("(")){
+                                s1.pop();
+                                break;
+                            }
+                            postFixList.add(s1.pop());
+                        }
+                    }
+                }
+
+            }
+            else {
+                //是数字
+                postFixList.add(item);
+            }
+        }
+
+        //完成对中缀表达式链表遍历
+        while (true){
+           if(s1.isEmpty()){
+               break;
+           }
+           postFixList.add(s1.pop());
+        }
+
+        return postFixList;
+
+    }
+
 
     public static int calculator(ArrayList<String> arrayList){
         ArrayStack4 calStack = new ArrayStack4(30);

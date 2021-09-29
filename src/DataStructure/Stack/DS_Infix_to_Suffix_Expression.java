@@ -4,19 +4,47 @@ import java.util.ArrayList;
 
 public class DS_Infix_to_Suffix_Expression {
     public static void main(String[] args) {
-        String infix = "1 + ( ( 2 + 3 ) * 4 ) - 5";
+        String infix = "1+((2+3)*4)-5";
         ArrayList<String> stringList = getStringList(infix);
         System.out.println(stringList);
-        String res = converter(stringList);
-        System.out.println(res);
+//        String res = converter(stringList);
+//        System.out.println(res);
     }
 
     public static ArrayList<String> getStringList(String infix){
-        String[] infixSplit = infix.split(" ");
         ArrayList<String> infixList = new ArrayList<String>();
-        for (String item : infixSplit){
-            infixList.add(item);
+        int index = 0;
+        char ch;
+        String num ="";
+        while (true){
+            ch = infix.charAt(index);
+            if(ch < '0' || ch > '9'){
+                //中缀表达式为运算符
+                infixList.add(""+ch);
+                index++;
+            }
+            else{
+                //中缀表达式位数字
+                while (true){
+                    System.out.println(ch);
+                    if(index >= infix.length() || ((ch = infix.charAt(index)) < '0' || ch > '9')){
+                        infixList.add(num);
+                        num = "";
+                        break;
+                    }
+                    num += ch;
+                    index++;
+                }
+
+            }
+
+            if(index >= infix.length()){
+                break;
+            }
+
+
         }
+
         return infixList;
     }
 
